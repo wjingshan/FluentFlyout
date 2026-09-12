@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using FluentFlyout.Classes;
 using FluentFlyout.Classes.Settings;
 using FluentFlyout.Classes.Utils;
+using FluentFlyout.Windows;
 using FluentFlyout.Controls;
 using FluentFlyoutWPF.Classes;
 using FluentFlyoutWPF.Models;
@@ -435,6 +436,73 @@ public partial class UserSettings : ObservableObject
     public partial bool TaskbarWidgetFixedWidth { get; set; }
 
     /// <summary>
+    /// Width of the taskbar widget in device independent pixels, used when <see cref="TaskbarWidgetFixedWidth"/>
+    /// is enabled.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TaskbarWidgetFixedWidthValueText))]
+    public partial int TaskbarWidgetFixedWidthValue { get; set; }
+
+    /// <summary>
+    /// Text representation of <see cref="TaskbarWidgetFixedWidthValue"/> for the settings text box.
+    /// </summary>
+    [XmlIgnore]
+    public string TaskbarWidgetFixedWidthValueText
+    {
+        get => TaskbarWidgetFixedWidthValue.ToString();
+        set
+        {
+            if (int.TryParse(value, out var result))
+            {
+                TaskbarWidgetFixedWidthValue = Math.Clamp(result, TaskbarWidgetControl.MinFixedWidth, TaskbarWidgetControl.MaxFixedWidth);
+            }
+            else
+            {
+                TaskbarWidgetFixedWidthValue = TaskbarWidgetControl.DefaultFixedWidth;
+            }
+
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets whether the widget is positioned by <see cref="TaskbarWidgetLeftMargin"/> instead of the
+    /// widget position / automatic padding settings (only used when the position is "near start").
+    /// </summary>
+    [ObservableProperty]
+    public partial bool TaskbarWidgetUseCustomLeftMargin { get; set; }
+
+    /// <summary>
+    /// Distance of the taskbar widget from the start of the taskbar (left edge, or top edge on a vertical
+    /// taskbar) in device independent pixels, used when <see cref="TaskbarWidgetUseCustomLeftMargin"/> is enabled.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TaskbarWidgetLeftMarginText))]
+    public partial int TaskbarWidgetLeftMargin { get; set; }
+
+    /// <summary>
+    /// Text representation of <see cref="TaskbarWidgetLeftMargin"/> for the settings text box.
+    /// </summary>
+    [XmlIgnore]
+    public string TaskbarWidgetLeftMarginText
+    {
+        get => TaskbarWidgetLeftMargin.ToString();
+        set
+        {
+            if (int.TryParse(value, out var result))
+            {
+                TaskbarWidgetLeftMargin = Math.Clamp(result, TaskbarWindow.MinCustomLeftMargin, TaskbarWindow.MaxCustomLeftMargin);
+            }
+            else
+            {
+                TaskbarWidgetLeftMargin = 20;
+            }
+
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the pause icon overlay should be completely hidden from view.
     /// </summary>
     [ObservableProperty]
@@ -563,6 +631,26 @@ public partial class UserSettings : ObservableObject
     /// </summary>
     [ObservableProperty]
     public partial int TaskbarVisualizerBarCount { get; set; }
+
+    /// <summary>
+    /// Width of the taskbar visualizer bar area, in device independent pixels (40 to 140).
+    /// </summary>
+    [ObservableProperty]
+    public partial int TaskbarVisualizerWidth { get; set; }
+
+    /// <summary>
+    /// The visualizer drawing style (0 = rounded bars, 1 = square bars, 2 = thin lines,
+    /// 3 = gradient bars, 4 = segmented bars, 5 = waveform line).
+    /// </summary>
+    [ObservableProperty]
+    public partial int TaskbarVisualizerStyle { get; set; }
+
+    /// <summary>
+    /// How the visualizer bars are colored (0 = single color, 1 = gradient from the album art palette,
+    /// 2 = rainbow sweep).
+    /// </summary>
+    [ObservableProperty]
+    public partial int TaskbarVisualizerColorMode { get; set; }
 
     /// <summary>
     /// Whether the visualizer should be symmetrical/mirrored.
@@ -752,6 +840,9 @@ public partial class UserSettings : ObservableObject
         TaskbarWidgetBackgroundBlur = false;
         TaskbarWidgetHideCompletely = false;
         TaskbarWidgetFixedWidth = false;
+        TaskbarWidgetFixedWidthValue = 240;
+        TaskbarWidgetUseCustomLeftMargin = false;
+        TaskbarWidgetLeftMargin = 20;
         TaskbarWidgetShowPauseOverlay = true;
         TaskbarWidgetControlsEnabled = false;
         TaskbarWidgetControlsPosition = 1;
@@ -766,6 +857,9 @@ public partial class UserSettings : ObservableObject
         TaskbarVisualizerPosition = 1;
         TaskbarVisualizerClickable = true;
         TaskbarVisualizerBarCount = 10;
+        TaskbarVisualizerWidth = 76;
+        TaskbarVisualizerStyle = 0;
+        TaskbarVisualizerColorMode = 0;
         TaskbarVisualizerCenteredBars = false;
         TaskbarVisualizerBaseline = false;
         TaskbarVisualizerAudioSensitivity = 2;
@@ -926,6 +1020,24 @@ public partial class UserSettings : ObservableObject
         UpdateTaskbar();
     }
 
+    partial void OnTaskbarWidgetFixedWidthValueChanged(int oldValue, int newValue)
+    {
+        if (oldValue == newValue || _initializing) return;
+        UpdateTaskbar();
+    }
+
+    partial void OnTaskbarWidgetUseCustomLeftMarginChanged(bool oldValue, bool newValue)
+    {
+        if (oldValue == newValue || _initializing) return;
+        UpdateTaskbar();
+    }
+
+    partial void OnTaskbarWidgetLeftMarginChanged(int oldValue, int newValue)
+    {
+        if (oldValue == newValue || _initializing) return;
+        UpdateTaskbar();
+    }
+
     partial void OnTaskbarWidgetShowPauseOverlayChanged(bool oldValue, bool newValue)
     {
         if (oldValue == newValue || _initializing) return;
@@ -1001,6 +1113,25 @@ public partial class UserSettings : ObservableObject
     {
         if (oldValue == newValue || _initializing) return;
         Visualizer.ResizeBarList(newValue);
+    }
+
+    partial void OnTaskbarVisualizerWidthChanged(int oldValue, int newValue)
+    {
+        if (oldValue == newValue || _initializing) return;
+        TaskbarVisualizerControl.OnTaskbarVisualizerWidthChanged(newValue);
+        UpdateTaskbar();
+    }
+
+    partial void OnTaskbarVisualizerStyleChanged(int oldValue, int newValue)
+    {
+        if (oldValue == newValue || _initializing) return;
+        TaskbarVisualizerControl.OnTaskbarVisualizerStyleChanged();
+    }
+
+    partial void OnTaskbarVisualizerColorModeChanged(int oldValue, int newValue)
+    {
+        if (oldValue == newValue || _initializing) return;
+        TaskbarVisualizerControl.OnTaskbarVisualizerStyleChanged();
     }
 
     partial void OnTaskbarVisualizerBaselineChanged(bool oldValue, bool newValue)

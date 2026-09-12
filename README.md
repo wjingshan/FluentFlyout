@@ -1,3 +1,25 @@
+> ## 📌 Personal fork — taskbar widget / visualizer tweaks
+>
+> This repository is my personal fork of [**unchihugo/FluentFlyout**](https://github.com/unchihugo/FluentFlyout),
+> based on upstream **v2.15.0** plus the commits that were on `master` at fork time.
+> All credit for the original application goes to the FluentFlyout authors.
+> Licensed under the same **GPL-3.0-or-later** (see [LICENSE](LICENSE)); the changes below are my modifications.
+>
+> Changes on top of upstream (full diff: [`fluentflyout-tweaks.patch`](fluentflyout-tweaks.patch)):
+>
+> | # | Change | Where |
+> |---|---|---|
+> | 1 | Taskbar visualizer **width** setting (40–140 px) | Settings → Taskbar Visualizer → Visualizer Width |
+> | 2 | Taskbar visualizer: **6 styles** (rounded bars / square bars / thin lines / gradient bars / segmented bars / waveform line) | Settings → Taskbar Visualizer → Visualizer Style |
+> | 3 | Taskbar visualizer: **3 color modes** (single color / album-art palette / rainbow gradient, using the cover art's dominant colors) | Settings → Taskbar Visualizer → Visualizer Colors |
+> | 4 | Taskbar widget **fixed width now takes a value** (80–420 px) instead of always using the maximum width | Settings → Taskbar Widget → Fixed Widget Width |
+> | 5 | Taskbar widget **custom left margin** — pin the widget at an exact distance from the left edge of the taskbar | Settings → Taskbar Widget → Left Margin |
+>
+> Prebuilt binaries (x64, self-compiled Release build) are attached to the [Releases](../../releases) page.
+> Modified files: `Classes/Visualizer.cs`, `Classes/Utils/BitmapHelper.cs`, `Controls/TaskbarVisualizerControl.xaml.cs`,
+> `Controls/TaskbarWidgetControl.xaml.cs`, `Windows/TaskbarWindow.xaml.cs`, `ViewModels/UserSettings.cs`,
+> `Pages/TaskbarVisualizerPage.xaml`, `Pages/TaskbarWidgetPage.xaml`, `Resources/Localization/Dictionary-{en-US,zh-CN}.xaml`.
+
 <p align="center">
 	<picture>
 		<source width="65%" alt="fluentflyout-title" media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/daa2969f-8ad2-4832-8253-26133a50c921" />
