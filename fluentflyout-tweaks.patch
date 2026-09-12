@@ -854,7 +854,7 @@
          // primaryPos → left (horizontal) or top (vertical); crossPos → top (horizontal) or left (vertical)
          Canvas.SetLeft(TaskbarVisualizer, (isVertical ? crossPos : primaryPos) / dpiScale);
 --- a/FluentFlyoutWPF/ViewModels/UserSettings.cs	2026-09-07 08:48:37.000000000 +0800
-+++ b/FluentFlyoutWPF/ViewModels/UserSettings.cs	2026-09-12 10:52:40.489978900 +0800
++++ b/FluentFlyoutWPF/ViewModels/UserSettings.cs	2026-09-12 12:34:50.948719600 +0800
 @@ -1,1061 +1,1192 @@
 -// Copyright (c) 2024-2026 The FluentFlyout Authors
 -// SPDX-License-Identifier: GPL-3.0-or-later
@@ -1923,8 +1923,8 @@
 +using FluentFlyout.Classes;
 +using FluentFlyout.Classes.Settings;
 +using FluentFlyout.Classes.Utils;
-+using FluentFlyout.Windows;
 +using FluentFlyout.Controls;
++using FluentFlyout.Windows;
 +using FluentFlyoutWPF.Classes;
 +using FluentFlyoutWPF.Models;
 +using FluentFlyoutWPF.Windows;
