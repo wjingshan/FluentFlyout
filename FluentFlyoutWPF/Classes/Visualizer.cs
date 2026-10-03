@@ -271,6 +271,7 @@ namespace FluentFlyoutWPF.Classes
 
                 if (_renderDevice == null)
                 {
+                    Logger.Warn("Visualizer: no render device available, capture not started");
                     return;
                 }
 
@@ -944,10 +945,17 @@ namespace FluentFlyoutWPF.Classes
 
         private void OnRecordingStopped(object? sender, StoppedEventArgs e)
         {
-            if (e.Exception != null)
-            {
-                Logger.Error(e.Exception, "Visualizer recording stopped due to an error");
-            }
+            if (e.Exception == null)
+                return;
+
+            Logger.Error(e.Exception, "Visualizer recording stopped due to an error");
+
+            // WASAPI loopback only produces data while something is actually playing, and an idle
+            // endpoint tears the capture down with AUDCLNT_E_DEVICE_INVALIDATED (0x88890004).
+            // Microsoft's documented recovery is to release and recreate the audio client, so ask
+            // for a restart instead of leaving the visualizer dead until the next device change,
+            // unlock or app restart.
+            RequestRestart($"recording stopped (0x{e.Exception.HResult:X8})");
         }
 
         public void Dispose()
